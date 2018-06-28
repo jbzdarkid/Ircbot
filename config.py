@@ -1,2 +1,2 @@
-chat_token='0a00a00a0aaaaaaaaaaaaaaaaaaaaa' # From https://twitchapps.com/tmi/
+chat_token='6b63g04b7shvguuqbcxyifhabeoens' # From https://twitchapps.com/tmi/
 username='jbzdarkid'
