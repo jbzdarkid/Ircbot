@@ -5,12 +5,13 @@ import threading
 import requests
 from config import chat_token, username
 
-from Tkinter import *
+from tkinter import *
 
 CHAT_MSG = compile('^:(\w+)!\w+@\w+.tmi.twitch.tv PRIVMSG #' + username + ' :(.*)\r\n$')
 
 def on_chat(username, message):
   print(username+': '+message)
+  print((username+': '+message))
 
   if message.startswith('!'):
     message_parts = message[1:].split(' ')
@@ -18,13 +19,13 @@ def on_chat(username, message):
       COMMANDS[message_parts[0]](message_parts[1:])
 
 def votekick(username, *args):
-  print('votekick start', username)
+  print(('votekick start', username))
 
 def ping(*args):
   send_message('pong')
 
 def commands(*args):
-  command_list = COMMANDS.keys()
+  command_list = list(COMMANDS.keys())
   command_list.sort()
   send_message('List of commands: ' + ', '.join(command_list))
 
@@ -76,7 +77,7 @@ if __name__ == '__main__':
         continue
       m = CHAT_MSG.search(data)
       if not m:
-        print 'Unable to parse message: "' + data + '"'
+        print('Unable to parse message: "' + data + '"')
         continue
       on_chat(m.group(1), m.group(2))
 
