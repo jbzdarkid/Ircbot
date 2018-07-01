@@ -11,6 +11,9 @@ chat_pos = (2, 9) # Half-line height
 
 def draw_text(text, color):
   global chat_pos
+  canvas.update()
+  if chat_pos[0] + len(text)*10 > canvas.winfo_width():
+    draw_newline()
   canvas.create_text(chat_pos, anchor='w', font='courier', text=text, fill=color)
   chat_pos = (chat_pos[0] + len(text)*10, chat_pos[1])
 
@@ -27,6 +30,9 @@ def draw_image(name, url):
     print('Loaded image [%s] from url [%s]' % (name, url))
   image = loaded_images[name]
   global chat_pos
+  canvas.update()
+  if chat_pos[0]  + image.width() > canvas.winfo_width():
+    draw_newline()
   canvas.create_image(chat_pos, image=image, anchor='w')
   chat_pos = (chat_pos[0] + image.width(), chat_pos[1])
 
@@ -107,21 +113,20 @@ def kappa():
 
 def start_ui():
   global canvas
+  global root
   # Create the UI
   root = Tk()
   root.title('Ircbot')
   root.geometry('500x500')
-  frame = Frame(root)
-  frame.pack(expand=True, fill='both')
-  canvas = Canvas(frame, bg='black')
+  Button(root, text='Debug', fg='red', command=debug).pack(side='bottom')
+  Button(root, text='Kappa', fg='red', command=kappa).pack(side='bottom')
+  canvas = Canvas(root, bg='black')
   canvas.pack(side='left', expand=True, fill='both')
   # TODO: On mac, this should be just "event.delta"
   root.bind_all('<MouseWheel>', lambda event: canvas.yview_scroll(event.delta//-120, 'units'))
-  scrollbar = Scrollbar(frame, orient='vertical', command=canvas.yview)
+  scrollbar = Scrollbar(root, orient='vertical', command=canvas.yview)
   scrollbar.pack(side='right', fill='y')
   canvas.config(yscrollcommand=scrollbar.set)
-  Button(root, text='Debug', fg='red', command=debug).pack(side='bottom')
-  Button(root, text='Kappa', fg='red', command=kappa).pack(side='bottom')
 
   draw_text('Chat bot started on ' + datetime.now().strftime('%m/%d/%Y'), DEFAULT_TEXT)
   draw_newline()

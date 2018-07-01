@@ -22,7 +22,7 @@ JTV_MSG = compile('^:(\w+)!\w+@\w+.tmi.twitch.tv PRIVMSG ' + my_username + ' :(.
 JOIN_MSG = compile(':(\w+)!\w+@\w+.tmi.twitch.tv JOIN #(\w+)\r\n')
 
 #:shoutgamers!shoutgamers@shoutgamers.tmi.twitch.tv PART #jbzdarkid
-PART_MSG = compile('^:(\w+)!\w+@\w+.tmi.twitch.tv PART #(\w+)\r\n$')
+PART_MSG = compile(':(\w+)!\w+@\w+.tmi.twitch.tv PART #(\w+)\r\n')
 
 def load_ffz_global():
   while 1:
@@ -104,10 +104,10 @@ def chat_listen():
         for m in JOIN_MSG.finditer(data):
           if m.group(2) == my_username:
             on_join(m.group(1))
-      elif PART_MSG.match(data):
-        m = PART_MSG.match(data)
-        if m.group(2) == my_username:
-          on_part(m.group(1))
+      elif PART_MSG.search(data):
+        for m in PART_MSG.finditer(data):
+          if m.group(2) == my_username:
+            on_join(m.group(1))
       else:
         print('Unable to parse message: """' + data + '"""')
 
