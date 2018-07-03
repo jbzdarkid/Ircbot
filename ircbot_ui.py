@@ -7,6 +7,18 @@ from tkinter import *
 
 DEFAULT_TEXT = 'white'
 emotes = {}
+badges = {
+  # TODO: These guids come from somewhere...
+  'premium': 'https://static-cdn.jtvnw.net/badges/v1/a1dd5073-19c3-4911-8cb4-c464a7bc1510/1',
+  'subscriber': 'https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/1',
+  'globalmod': 'https://static-cdn.jtvnw.net/chat-badges/globalmod.png',
+  'admin': 'https://static-cdn.jtvnw.net/chat-badges/admin.png',
+  'broadcaster': 'https://static-cdn.jtvnw.net/chat-badges/broadcaster.png',
+  'mod': 'https://static-cdn.jtvnw.net/chat-badges/mod.png',
+  'staff': 'https://static-cdn.jtvnw.net/chat-badges/staff.png',
+  'turbo': 'https://static-cdn.jtvnw.net/chat-badges/turbo.png',
+}
+
 chat_pos = (2, 9) # Half-line height
 
 def draw_text(text, color):
@@ -72,12 +84,7 @@ def on_chat(line_data, username, message):
   if 'badges' in line_data and line_data['badges'] != '':
     for badge in line_data['badges'].split(','):
       name, _ = badge.split('/')
-      if name == 'subscriber':
-        # TODO: This guid comes from somewhere...
-        url = 'https://static-cdn.jtvnw.net/badges/v1/5d9f2208-5dd8-11e7-8513-2ff4adfae661/1'
-      else:
-        url = 'https://static-cdn.jtvnw.net/chat-badges/' + name + '.png'
-      draw_image('badge_' + name, url)
+      draw_image('badge_' + name, badges[name])
 
   if 'display-name' not in line_data or line_data['display-name'] == '':
     line_data['display-name'] = username
