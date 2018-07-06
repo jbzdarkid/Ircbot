@@ -98,7 +98,6 @@ def chat_listen():
         line_data = {}
         for kvp in m.group(1).split(';'):
           line_data[kvp.split('=')[0]] = kvp.split('=')[1]
-        print(line_data)
         on_chat(line_data, m.group(2), m.group(3))
       elif JOIN_MSG.search(data):
         for m in JOIN_MSG.finditer(data):
@@ -114,33 +113,16 @@ def chat_listen():
 if __name__ == '__main__':
   # Connect to twitch
   irc = socket()
-  print('<97>')
   irc.connect(('irc.chat.twitch.tv', 6667))
-  print('<99>')
   # send(irc, 'PASS asdf')
   # send(irc, 'NICK ' + my_username)
   send(irc, 'NICK justinfan%05d' % randint(0, 99999))
-  irc.recv(4096) # You are in a maze of twisty passages
-  print('<103>')
 
   send(irc, 'CAP REQ :twitch.tv/membership')
-  irc.recv(1024) # CAP * ACK :twitch.tv/membership
-  print('<107>')
   send(irc, 'CAP REQ :twitch.tv/tags')
-  irc.recv(1024) # CAP * ACK :twitch.tv/tags
-  print('<110>')
   send(irc, 'CAP REQ :twitch.tv/commands')
-  irc.recv(1024) # CAP * ACK :twitch.tv/commands
-  print('<116>')
-
   send(irc, 'JOIN #' + my_username)
-  irc.recv(1024) # /JOIN
-  irc.recv(1024) # End of /NAMES list
-  print('<118>')
   send(irc, 'JOIN #jtv')
-  irc.recv(1024) # /JOIN
-  irc.recv(1024) # End of /NAMES list
-  print('<122>')
 
   irc.setblocking(0)
 
