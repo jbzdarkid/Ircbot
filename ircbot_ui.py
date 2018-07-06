@@ -54,6 +54,33 @@ def draw_newline():
   canvas.config(scrollregion=(0, 0, 0, chat_pos[1]))
   canvas.yview_moveto(1.0)
 
+def pop_up(button, contents):
+  if hasattr(button, 'popup'):
+    return
+  button.popup = Toplevel()
+  button.popup.geometry('200x200')
+  Label(button.popup , text=contents).pack()
+
+def pop_up_close(button):
+  if hasattr(button, 'popup'):
+    button.popup.destroy()
+  button.pack_forget()
+  
+def on_command(line_data, username, message):
+  parts = message.split(' ', 1)
+  command = parts[0][1:].lower()
+  contents = parts[1] if len(parts) > 1 else ''
+
+  if command in ['remind', 'reminder', 'remindme']:
+    server_time = datetime.fromtimestamp(int(line_data['tmi-sent-ts']) / 1000) # Float division
+    contents = 'Reminder from %s at %s:\n%s' % (username, server_time.strftime('%I:%M:%S'), contents)
+    button = Button(reminders,
+      text = username + ' ' + server_time.strftime('%I:%M:%S'),
+      command = lambda: pop_up(button, contents)
+    )
+    button.bind('<Button-3>', lambda event: pop_up_close(button))
+    button.pack()
+  
 def on_chat(line_data, username, message):
   global emotes
   
@@ -70,8 +97,9 @@ def on_chat(line_data, username, message):
   # Parse twitch emote names
   if 'emotes' in line_data and line_data['emotes'] != '':
     for emote in line_data['emotes'].split('/'):
+      # 'emotes':'1902:18-22/65:24-31/25:0-4,6-10,12-16'
       id, emote = emote.split(':')
-      start, end = emote.split('-')
+      start, end = emote.split(',')[0].split('-')
       name = message[int(start):int(end)+1]
       # Twitch images. /2.0 and /3.0 are larger images.
       if name not in emotes:
@@ -79,7 +107,12 @@ def on_chat(line_data, username, message):
 
   # TODO: line_data['bits'] (int) ???
 
-  draw_text(datetime.now().strftime('%I:%M:%S') + ' ', DEFAULT_TEXT) # Draw the timestamp
+  if message.startswith('!'):
+    on_command(line_data, username, message)
+    # return
+
+  server_time = datetime.fromtimestamp(int(line_data['tmi-sent-ts']) / 1000) # Float division
+  draw_text(server_time.strftime('%I:%M:%S') + ' ', DEFAULT_TEXT) # Draw the timestamp
 
   if 'badges' in line_data and line_data['badges'] != '':
     for badge in line_data['badges'].split(','):
@@ -119,14 +152,20 @@ def kappa():
   on_chat({'emotes':''}, 'Ircbot', 'abc Kappa ;) 123')
 
 def start_ui():
-  global canvas
   global root
+  global reminders
+  global canvas
   # Create the UI
   root = Tk()
   root.title('Ircbot')
-  root.geometry('500x500')
-  Button(root, text='Debug', fg='red', command=debug).pack(side='bottom')
-  Button(root, text='Kappa', fg='red', command=kappa).pack(side='bottom')
+  root.geometry('1000x1000')
+  # root.iconbitmap('favicon.ico')
+  reminders = Frame(root, width=250)
+  reminders.pack(side='left')
+  # TODO: Userlist
+
+  # Button(root, text='Debug', fg='red', command=debug).pack(side='left')
+  # Button(root, text='Kappa', fg='red', command=kappa).pack(side='left')
   canvas = Canvas(root, bg='black')
   canvas.pack(side='left', expand=True, fill='both')
   # TODO: On mac, this should be just "event.delta"
