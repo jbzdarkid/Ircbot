@@ -11,7 +11,7 @@ class Reminder(Button):
     self.bind('<Button-3>', self.rightclick)
 
   def leftclick(self, event):
-    if self.popup:
+    if self.popup and self.popup.winfo_exists():
       return
     self.popup = Toplevel()
     self.popup.geometry('200x200')

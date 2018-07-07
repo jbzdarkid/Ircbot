@@ -18,10 +18,6 @@ class ChatWindow(Canvas):
     self.loaded_images = {}
     self.previous_was_text = False
     
-    self.draw_text('Chat bot started on ' + datetime.now().strftime('%m/%d/%Y'), 'white')
-    self.draw_newline()
-
-    
   def onscroll(self, event):
     # TODO: On mac, this should be just "event.delta"
     self.yview_scroll(event.delta//-120, 'units')

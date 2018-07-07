@@ -87,12 +87,9 @@ def on_chat(line_data, username, message):
       chat_window.draw_text(word, line_data['color'])
   chat_window.draw_newline()
 
-
-
 def start_ui():
-  global root
   global reminders
-  global canvas
+  global chat_window
   # Create the UI
   root = Tk()
   root.title('Ircbot')
@@ -100,13 +97,12 @@ def start_ui():
   # root.iconbitmap('favicon.ico')
   reminders = Frame(root, width=250)
   reminders.pack(side='left')
-  # TODO: Userlist
 
   # Button(root, text='Debug', fg='red', command=debug).pack(side='left')
   # Button(root, text='Kappa', fg='red', command=kappa).pack(side='left')
   chat_window = ChatWindow(root, bg='black')
   chat_window.pack(side='left', expand=True, fill='both')
-  # chat_window.draw_text('Chat bot started on ' + datetime.now().strftime('%m/%d/%Y'), DEFAULT_TEXT)
-  # chat_window.draw_newline()
+  chat_window.draw_text('Chat bot started on ' + datetime.now().strftime('%m/%d/%Y'), DEFAULT_TEXT)
+  chat_window.draw_newline()
   
   root.mainloop()
