@@ -1,10 +1,7 @@
-from PIL import Image as PIL_Image
-from PIL import ImageTk
-from datetime import datetime
-from io import BytesIO
-from urllib import request
-from tkinter import *
 from ircbot_reminder import Reminder
+from ircbot_chat_window import ChatWindow
+from datetime import datetime
+from tkinter import *
 
 DEFAULT_TEXT = 'white'
 emotes = {}
@@ -19,41 +16,6 @@ badges = {
   'staff': 'https://static-cdn.jtvnw.net/chat-badges/staff.png',
   'turbo': 'https://static-cdn.jtvnw.net/chat-badges/turbo.png',
 }
-
-chat_pos = (2, 9) # Half-line height
-
-def draw_text(text, color):
-  global chat_pos
-  canvas.update()
-  if chat_pos[0] + len(text)*10 > canvas.winfo_width():
-    draw_newline()
-  canvas.create_text(chat_pos, anchor='w', font='courier', text=text, fill=color)
-  chat_pos = (chat_pos[0] + len(text)*10, chat_pos[1])
-
-loaded_images = {}
-def draw_image(name, url):
-  global loaded_images
-  if name not in loaded_images:
-    try:
-      img_bytes = BytesIO(request.urlopen(url).read())
-    except:
-      print('Failed to load image [%s] from url [%s]' % (name, url))
-      return
-    loaded_images[name] = ImageTk.PhotoImage(PIL_Image.open(img_bytes))
-    print('Loaded image [%s] from url [%s]' % (name, url))
-  image = loaded_images[name]
-  global chat_pos
-  canvas.update()
-  if chat_pos[0]  + image.width() > canvas.winfo_width():
-    draw_newline()
-  canvas.create_image(chat_pos, image=image, anchor='w')
-  chat_pos = (chat_pos[0] + image.width(), chat_pos[1])
-
-def draw_newline():
-  global chat_pos
-  chat_pos = (0, chat_pos[1] + 28)
-  canvas.config(scrollregion=(0, 0, 0, chat_pos[1]))
-  canvas.yview_moveto(1.0)
 
 def on_command(line_data, username, message):
   parts = message.split(' ', 1)
@@ -96,44 +58,36 @@ def on_chat(line_data, username, message):
     # return
 
   server_time = datetime.fromtimestamp(int(line_data['tmi-sent-ts']) / 1000) # Float division
-  draw_text(server_time.strftime('%I:%M:%S') + ' ', DEFAULT_TEXT) # Draw the timestamp
+  chat_window.draw_text(server_time.strftime('%I:%M:%S') + ' ', DEFAULT_TEXT) # Draw the timestamp
 
   if 'badges' in line_data and line_data['badges'] != '':
     for badge in line_data['badges'].split(','):
       name, _ = badge.split('/')
-      draw_image('badge_' + name, badges[name])
+      chat_window.draw_image('badge_' + name, badges[name])
 
   if 'display-name' not in line_data or line_data['display-name'] == '':
     line_data['display-name'] = username
   if 'color' not in line_data or line_data['color'] == '':
     line_data['color'] = DEFAULT_TEXT
 
-  draw_text(line_data['display-name'], line_data['color'])
+  chat_window.draw_text(line_data['display-name'], line_data['color'])
 
   if message.startswith('\x01ACTION '):
     message = message[8:-1] # Trailing \x01 as well
     # Keep username color
   else:
     line_data['color'] = DEFAULT_TEXT
-    draw_text(':', line_data['color'])
+    chat_window.previous_was_text = False # TODO: This is a dirty hack.
+    chat_window.draw_text(':', line_data['color'])
   
-  previous_word_was_text = False
   for word in message.split(' '):
     if word in emotes:
-      draw_image('emote_' + word, emotes[word])
-      previous_word_was_text = False
+      chat_window.draw_image('emote_' + word, emotes[word])
     else:
-      if previous_word_was_text:
-        draw_text(' ', line_data['color'])
-      draw_text(word, line_data['color'])
-      previous_word_was_text = True
-  draw_newline()
+      chat_window.draw_text(word, line_data['color'])
+  chat_window.draw_newline()
 
-def debug():
-  on_chat({}, 'Ircbot', 'DEBUG')
 
-def kappa():
-  on_chat({'emotes':''}, 'Ircbot', 'abc Kappa ;) 123')
 
 def start_ui():
   global root
@@ -150,15 +104,9 @@ def start_ui():
 
   # Button(root, text='Debug', fg='red', command=debug).pack(side='left')
   # Button(root, text='Kappa', fg='red', command=kappa).pack(side='left')
-  canvas = Canvas(root, bg='black')
-  canvas.pack(side='left', expand=True, fill='both')
-  # TODO: On mac, this should be just "event.delta"
-  root.bind_all('<MouseWheel>', lambda event: canvas.yview_scroll(event.delta//-120, 'units'))
-  scrollbar = Scrollbar(root, orient='vertical', command=canvas.yview)
-  scrollbar.pack(side='right', fill='y')
-  canvas.config(yscrollcommand=scrollbar.set)
-
-  draw_text('Chat bot started on ' + datetime.now().strftime('%m/%d/%Y'), DEFAULT_TEXT)
-  draw_newline()
+  chat_window = ChatWindow(root, bg='black')
+  chat_window.pack(side='left', expand=True, fill='both')
+  # chat_window.draw_text('Chat bot started on ' + datetime.now().strftime('%m/%d/%Y'), DEFAULT_TEXT)
+  # chat_window.draw_newline()
   
   root.mainloop()
