@@ -1,8 +1,8 @@
+from io import BytesIO
 from PIL import Image as PIL_Image
 from PIL import ImageTk
-from io import BytesIO
-from urllib import request
 from tkinter import *
+from urllib import request
 
 class ChatWindow(Canvas):
   def __init__(self, parent, *args, **kwargs):

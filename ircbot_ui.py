@@ -1,6 +1,6 @@
-from ircbot_reminder import Reminder
-from ircbot_chat_window import ChatWindow
 from datetime import datetime
+from ircbot_chat_window import ChatWindow
+from ircbot_reminder import Reminder
 from tkinter import *
 
 DEFAULT_TEXT = 'white'

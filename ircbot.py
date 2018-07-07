@@ -1,14 +1,18 @@
 # Known bug: "/me Kappa" will not send emote data (25:0-4), so I can't detect that "Kappa" is an emote. If "Kappa" is already known to be an emote, then this causes no problems.
 
-from ircbot_ui import on_chat, start_ui, emotes
+# TODO: Logging instead of console printout
+# TODO: Userlist
+# TODO: Move emote loading into ircbot_ui
+
+from ircbot_ui import emotes, on_chat, start_ui
 from json import load
+from random import randint
 from re import compile, findall
 from select import select
 from socket import socket
 from threading import Thread
-from urllib import request
-from random import randint
 from time import sleep
+from urllib import request
 
 my_username = 'jbzdarkid'
 
