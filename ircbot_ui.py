@@ -4,6 +4,7 @@ from datetime import datetime
 from io import BytesIO
 from urllib import request
 from tkinter import *
+from ircbot_reminder import Reminder
 
 DEFAULT_TEXT = 'white'
 emotes = {}
@@ -54,18 +55,6 @@ def draw_newline():
   canvas.config(scrollregion=(0, 0, 0, chat_pos[1]))
   canvas.yview_moveto(1.0)
 
-def pop_up(button, contents):
-  if hasattr(button, 'popup'):
-    return
-  button.popup = Toplevel()
-  button.popup.geometry('200x200')
-  Label(button.popup , text=contents).pack()
-
-def pop_up_close(button):
-  if hasattr(button, 'popup'):
-    button.popup.destroy()
-  button.pack_forget()
-  
 def on_command(line_data, username, message):
   parts = message.split(' ', 1)
   command = parts[0][1:].lower()
@@ -74,12 +63,7 @@ def on_command(line_data, username, message):
   if command in ['remind', 'reminder', 'remindme']:
     server_time = datetime.fromtimestamp(int(line_data['tmi-sent-ts']) / 1000) # Float division
     contents = 'Reminder from %s at %s:\n%s' % (username, server_time.strftime('%I:%M:%S'), contents)
-    button = Button(reminders,
-      text = username + ' ' + server_time.strftime('%I:%M:%S'),
-      command = lambda: pop_up(button, contents)
-    )
-    button.bind('<Button-3>', lambda event: pop_up_close(button))
-    button.pack()
+    Reminder(reminders, contents, text=username + ' ' + server_time.strftime('%I:%M:%S')).pack()
   
 def on_chat(line_data, username, message):
   global emotes
