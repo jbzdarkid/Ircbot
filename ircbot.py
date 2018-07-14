@@ -3,7 +3,6 @@
 # TODO: Logging instead of console printout
 # TODO: Userlist
 # TODO: Move emote loading into ircbot_ui
-# TODO: Fix the chat auto-scroll
 # TODO: Fix #jtv channel to sign in with your real username
 
 from ircbot_ui import emotes, on_chat, start_ui

@@ -9,8 +9,7 @@ class ChatWindow(Canvas):
     Canvas.__init__(self, parent, *args, **kwargs)
     scrollbar = Scrollbar(parent, orient='vertical', command=self.yview)
     scrollbar.pack(side='right', fill='y')
-    self.yscrollcommand = scrollbar.set
-    # self.config(yscrollcommand=scrollbar.set)
+    self.config(yscrollcommand=scrollbar.set)
     self.bind_all('<MouseWheel>', self.onscroll)
 
     self.x = 2
@@ -60,7 +59,6 @@ class ChatWindow(Canvas):
   def draw_newline(self):
     self.x = 0
     self.y += 28 # Standard twitch image height
-    self.scrollregion = (0, 0, 0, self.y)
-    # self.config(scrollregion=(0, 0, 0, self.y))
+    self.config(scrollregion=(0, 0, 0, self.y))
     self.yview_moveto(1.0)
     self.previous_was_text = False

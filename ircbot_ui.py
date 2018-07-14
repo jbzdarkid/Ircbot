@@ -96,7 +96,7 @@ def start_ui():
   # Create the UI
   root = Tk()
   root.title('Ircbot')
-  root.geometry('1000x1000')
+  root.geometry('1000x1000+0+0')
   # root.iconbitmap('favicon.ico')
   reminders = Frame(root, width=250)
   reminders.pack(side='left')
