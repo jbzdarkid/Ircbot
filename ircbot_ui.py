@@ -87,6 +87,9 @@ def on_chat(line_data, username, message):
       chat_window.draw_text(word, line_data['color'])
   chat_window.draw_newline()
 
+  
+def debug():
+  on_chat({'tmi-sent-ts':'1531588971'}, 'Ircbot', 'DEBUG')
 def start_ui():
   global reminders
   global chat_window
@@ -98,7 +101,7 @@ def start_ui():
   reminders = Frame(root, width=250)
   reminders.pack(side='left')
 
-  # Button(root, text='Debug', fg='red', command=debug).pack(side='left')
+  Button(root, text='Debug', fg='red', command=debug).pack(side='left')
   # Button(root, text='Kappa', fg='red', command=kappa).pack(side='left')
   chat_window = ChatWindow(root, bg='black')
   chat_window.pack(side='left', expand=True, fill='both')
