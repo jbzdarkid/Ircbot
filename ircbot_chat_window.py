@@ -18,6 +18,19 @@ class ChatWindow(Canvas):
     self.loaded_images = {}
     self.previous_was_text = False
     
+  def load_image(self, name, url):
+    # TODO: Disk caching?
+    if name in self.loaded_images:
+      return self.loaded_images[name]
+    try:
+      img_bytes = BytesIO(request.urlopen(url).read())
+    except:
+      print('Failed to load image [%s] from url [%s]' % (name, url))
+      return
+    self.loaded_images[name] = ImageTk.PhotoImage(PIL_Image.open(img_bytes))
+    print('Loaded image [%s] from url [%s]' % (name, url))
+    return self.loaded_images[name]
+
   def onscroll(self, event):
     # TODO: On mac, this should be just "event.delta"
     self.yview_scroll(event.delta//-120, 'units')
@@ -38,15 +51,7 @@ class ChatWindow(Canvas):
     self.previous_was_text = True
 
   def draw_image(self, name, url):
-    if name not in self.loaded_images:
-      try:
-        img_bytes = BytesIO(request.urlopen(url).read())
-      except:
-        print('Failed to load image [%s] from url [%s]' % (name, url))
-        return
-      self.loaded_images[name] = ImageTk.PhotoImage(PIL_Image.open(img_bytes))
-      print('Loaded image [%s] from url [%s]' % (name, url))
-    image = self.loaded_images[name]
+    image = self.load_image(name, url)
     self.linewrap(image.width())
     self.create_image((self.x, self.y), image=image, anchor='w')
     self.x += image.width()
