@@ -1,3 +1,8 @@
+# Raw chat logs
+logs/
+# User token
+my_token.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
