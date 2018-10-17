@@ -31,7 +31,6 @@ from time import sleep
 from urllib import request
 from tkinter import *
 from ircbot_chat_window import ChatWindow, emotes
-from ircbot_reminder import Reminder
 from my_logger import log_tk_exception, log, log_exception
 from datetime import datetime
 
@@ -175,10 +174,20 @@ def start_ui():
   reminders = Frame(root, width=250)
   reminders.pack(side='left')
 
+  """
+  Label(root, text='Send message:').pack(side='bottom')
+  chat_message = StringVar()
+  Entry(root, textvariable=chat_message).pack(side='bottom')
+  def parse_entry(chat_message):
+    self.send_message(chat_message.get())
+
+  root.bind('<Return>', lambda: parse_entry(chat_message))
+  """
+
   Button(root, text='Debug', fg='red', command=debug).pack(side='left')
   Button(root, text='Error', fg='red', command=error).pack(side='left')
   Button(root, text='Test', fg='red', command=test).pack(side='left')
-  chat_window = ChatWindow(root, bg='black')
+  chat_window = ChatWindow(root, reminders, bg='black')
   chat_window.pack(side='left', expand=True, fill='both')
   chat_window.draw_text('Chat bot started on ' + datetime.now().strftime('%m/%d/%Y'))
   chat_window.draw_newline()

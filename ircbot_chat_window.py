@@ -4,9 +4,10 @@ from PIL import ImageTk
 from tkinter import *
 from urllib import request
 from datetime import datetime
+from ircbot_reminder import Reminder
 
 class ChatWindow(Canvas):
-  def __init__(self, parent, *args, **kwargs):
+  def __init__(self, parent, reminders, *args, **kwargs):
     Canvas.__init__(self, parent, *args, **kwargs)
     scrollbar = Scrollbar(parent, orient='vertical', command=self.yview)
     scrollbar.pack(side='right', fill='y')
@@ -15,6 +16,7 @@ class ChatWindow(Canvas):
 
     self.x = 2
     self.y = 9 # Half-line height
+    self.reminders = reminders
     self.loaded_images = {}
 
   def load_image(self, name, url):
@@ -61,6 +63,16 @@ class ChatWindow(Canvas):
     self.config(scrollregion=(0, 0, 0, self.y))
     self.yview_moveto(1.0)
 
+  def on_command(self, line_data, username, message):
+    parts = message.split(' ', 1)
+    command = parts[0][1:].lower()
+    contents = parts[1] if len(parts) > 1 else ''
+
+    if command in ['remind', 'reminder', 'remindme']:
+      server_time = datetime.fromtimestamp(int(line_data['tmi-sent-ts']) / 1000) # Float division
+      contents = 'Reminder from %s at %s:\n%s' % (username, server_time.strftime('%I:%M:%S'), contents)
+      Reminder(self.reminders, contents, text=username + ' ' + server_time.strftime('%I:%M:%S')).pack()
+
   def on_chat(self, line_data, username, message):
     global emotes # TODO: Class member?
 
@@ -88,7 +100,7 @@ class ChatWindow(Canvas):
       print(line_data['bits']) # TODO: ???
 
     if message.startswith('!'):
-      on_command(line_data, username, message)
+      self.on_command(line_data, username, message)
       # return
 
     server_time = datetime.fromtimestamp(int(line_data['tmi-sent-ts']) / 1000) # Float division
@@ -111,19 +123,21 @@ class ChatWindow(Canvas):
       message = message[8:-1] # Trailing \x01 as well
     else: # Normal message, reset color
       line_data['color'] = None
-      self.draw_text(':')
+      self.draw_text(': ')
+
 
     for word in message.split(' '):
       if word in emotes:
         self.draw_image('emote_' + word, emotes[word])
       else:
-        self.draw_text(word, line_data['color'])
+        self.draw_text(word + ' ', line_data['color'])
     self.draw_newline()
 
 
 emotes = {
   'Kappa': 'https://static-cdn.jtvnw.net/emoticons/v1/25/1.0',
 }
+
 badges = {
   # TODO: These GUIDs come from somewhere...
   'premium': 'https://static-cdn.jtvnw.net/badges/v1/a1dd5073-19c3-4911-8cb4-c464a7bc1510/1',
@@ -136,13 +150,3 @@ badges = {
   'staff': 'https://static-cdn.jtvnw.net/chat-badges/staff.png',
   'turbo': 'https://static-cdn.jtvnw.net/chat-badges/turbo.png',
 }
-
-def on_command(line_data, username, message):
-  parts = message.split(' ', 1)
-  command = parts[0][1:].lower()
-  contents = parts[1] if len(parts) > 1 else ''
-
-  if command in ['remind', 'reminder', 'remindme']:
-    server_time = datetime.fromtimestamp(int(line_data['tmi-sent-ts']) / 1000) # Float division
-    contents = 'Reminder from %s at %s:\n%s' % (username, server_time.strftime('%I:%M:%S'), contents)
-    Reminder(reminders, contents, text=username + ' ' + server_time.strftime('%I:%M:%S')).pack()
