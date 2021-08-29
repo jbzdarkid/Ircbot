@@ -20,6 +20,7 @@
   # File "C:\Users\localhost\Documents\GitHub\Ircbot\ircbot_chat_window.py", line 54, in draw_image
     # self.linewrap(image.width())
 # AttributeError: 'NoneType' object has no attribute 'width'
+# TODO: Bad OAuth token doesn't show an error (ideally in UI)
 
 from json import load
 from random import randint
